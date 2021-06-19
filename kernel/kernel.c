@@ -60,11 +60,13 @@ void print(const char* str)
 	}
 }
 
-void main()
+int main()
 {
 	char clear[80*25 + 1];
 	memset(clear, ' ', 80*25);
 	print(clear);
 
 	print("There we go bois");
+
+	return 0;
 }
