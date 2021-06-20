@@ -55,7 +55,7 @@ void print(const char* str)
 		videoPtr++;
 
 		// Set formatting
-		*videoPtr = (char)0x8c;
+		*videoPtr = (char)0x0f;
 		videoPtr++;
 	}
 }
@@ -66,7 +66,7 @@ int main()
 	memset(clear, ' ', 80*25);
 	print(clear);
 
-	print("There we go bois");
+	print("Get fucked Andrew, my OS works in VirtualBox just fine :moai:");
 
 	return 0;
 }
