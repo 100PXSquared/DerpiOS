@@ -1,20 +1,16 @@
+#include "utils.h"
+#include "drivers/screen.h"
+
 #define true 1
 #define false 0
 #define NULL (void*)0
-
-void* memset(void* data, int val, unsigned long long len)
-{
-	unsigned char* ptr = data;
-	while (len-- > 0) *ptr++ = val;
-	return data;
-}
 
 void uint_to_string(unsigned int number, char out[20])
 {
 	char* ptr = out;
 
 	unsigned int i;
-	unsigned int hitnum = false;
+	unsigned char hitnum = false;
 	for (i = 0; i < 20; i++) {
 		unsigned int digit = number;
 		unsigned int place = 1;
@@ -45,7 +41,7 @@ unsigned long long strlen(const char* str)
 	return ptr - str;
 }
 
-void print(const char* str)
+void printOLD(const char* str)
 {
 	char* videoPtr = (char*)0xb8000;
 	const char* stringPtr;
@@ -62,11 +58,11 @@ void print(const char* str)
 
 int main()
 {
-	char clear[80*25 + 1];
-	memset(clear, ' ', 80*25);
-	print(clear);
+	clear();
+	enable_cursor();
+	print("DerpiOS Kernel - v0.1.0\n");
+	print("Screen device driver loaded!\n");
 
-	print("Get fucked Andrew, my OS works in VirtualBox just fine :moai:");
 
 	return 0;
 }

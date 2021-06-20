@@ -1,4 +1,7 @@
 TARGET=i686-elf
+SOURCE=$(wildcard kernel/*/*.c) $(wildcard kernel/*.c)
+HEADER=$(wildcard kernel/*/*.h) $(wildcard kernel/*.h)
+OBJECT=$(SOURCE:.c=.o)
 
 all: DerpiOS.iso
 
@@ -13,11 +16,11 @@ DerpiOS.iso: ./iso/floppy.img
 	dd if=./build/kernel.bin of=$@ seek=1 conv=notrunc
 
 # Kernel
-./build/kernel.bin: ./build/kernel_entry.o ./build/kernel.o
+./build/kernel.bin: ./build/kernel_entry.o $(OBJECT)
 	$(TARGET)-ld -o $@ -Ttext 0x7e00 $^ --oformat binary
 
-./build/kernel.o: ./kernel/kernel.c
-	$(TARGET)-gcc -ffreestanding -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector -nostartfiles -nodefaultlibs -c $< -o $@
+.c.o:
+	$(TARGET)-gcc -ffreestanding -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector -nostartfiles -nodefaultlibs -Tkernel -c $< -o $@
 
 ./build/kernel_entry.o: ./kernel/kernel_entry.asm
 	nasm $< -f elf -o $@
@@ -26,5 +29,9 @@ DerpiOS.iso: ./iso/floppy.img
 ./build/bootsector.bin: ./bootsector/bootsector.asm
 	nasm $< -f bin -o $@
 
+# Commands
 clean:
-	rm ./build/*
+	rm $(OBJECT) ./iso/floppy.img ./DerpiOS.iso ./build/*
+
+run: all
+	qemu-system-i386 -cdrom ./DerpiOS.iso
