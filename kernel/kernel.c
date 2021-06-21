@@ -1,5 +1,6 @@
 #include "utils.h"
 #include "drivers/screen.h"
+#include "drivers/serial.h"
 
 #define true 1
 #define false 0
@@ -41,28 +42,15 @@ unsigned long long strlen(const char* str)
 	return ptr - str;
 }
 
-void printOLD(const char* str)
-{
-	char* videoPtr = (char*)0xb8000;
-	const char* stringPtr;
-	for (stringPtr = str; *stringPtr != '\0'; stringPtr++) { // For each byte in the array, bar the null terminator, push to the display
-		// Set char
-		*videoPtr = *stringPtr;
-		videoPtr++;
-
-		// Set formatting
-		*videoPtr = (char)0x0f;
-		videoPtr++;
-	}
-}
-
 int main()
 {
 	clear();
 	enable_cursor();
 	print("DerpiOS Kernel - v0.1.0\n");
-	print("Screen device driver loaded!\n");
+	print("Screen driver loaded!\n");
 
+	serial_init(SERIAL_COM1, 1);
+	serial_print("Serial driver loaded!", SERIAL_COM1);
 
 	return 0;
 }
