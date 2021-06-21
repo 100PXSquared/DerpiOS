@@ -55,10 +55,12 @@ int main()
 	div_by_zero.offset_high = (int)interrupt_handler_0 >> 16;
 	div_by_zero.offset_low = (int)interrupt_handler_0 & 0x0000ffff;
 	div_by_zero.segment_selector = 0x0008;
-	div_by_zero.attrs = 0x8f;
+	div_by_zero.attrs = 0x8e;
+
+	idt_tbl[0] = div_by_zero;
 
 	struct idt_ptr idt;
-	idt.size = 1;
+	idt.size = sizeof(struct idt_entry) * 256 - 1;
 	idt.ptr = idt_tbl;
 	load_idt(idt);
 
@@ -67,7 +69,7 @@ int main()
 	print("DerpiOS Kernel - v0.1.0\n");
 	print("Screen driver loaded!\n");
 
-	//int x = 1/0; // Trying to trigger the divide by 0 isr, but just crashes the OS
+	int x = 1/0; // Triggers the divide by 0 ISR
 
 	return 0;
 }
