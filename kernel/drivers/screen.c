@@ -11,10 +11,10 @@ unsigned int get_vidmem_offset(const int col, const int row)
 // Get the hardware cursor position
 unsigned int get_cursor()
 {
-	port_byte_out(REG_SCREEN_CTRL, 14);                       // Set hardware ptr to lower byte
-	unsigned int offset = port_byte_in(REG_SCREEN_DATA) << 8; // Get byte
-	port_byte_out(REG_SCREEN_CTRL, 15);                       // Set hardware ptr to upper byte
-	offset += port_byte_in(REG_SCREEN_DATA);                  // Get byte
+	outb(REG_SCREEN_CTRL, 14);                       // Set hardware ptr to lower byte
+	unsigned int offset = inb(REG_SCREEN_DATA) << 8; // Get byte
+	outb(REG_SCREEN_CTRL, 15);                       // Set hardware ptr to upper byte
+	offset += inb(REG_SCREEN_DATA);                  // Get byte
 
 	return offset * 2; // Convert chars to offset
 }
@@ -24,35 +24,35 @@ void set_cursor(unsigned int offset)
 {
 	offset /= 2; // Convert offset to chars
 
-	port_byte_out(REG_SCREEN_CTRL, 14);                           // Set hardware ptr to lower byte
-	port_byte_out(REG_SCREEN_DATA, (unsigned char)(offset >> 8)); // Set byte
-	port_byte_out(REG_SCREEN_CTRL, 15);                           // Set hardware ptr to upper byte
-	port_byte_out(REG_SCREEN_DATA, (unsigned char)offset);        // Set byte
+	outb(REG_SCREEN_CTRL, 14);                           // Set hardware ptr to lower byte
+	outb(REG_SCREEN_DATA, (unsigned char)(offset >> 8)); // Set byte
+	outb(REG_SCREEN_CTRL, 15);                           // Set hardware ptr to upper byte
+	outb(REG_SCREEN_DATA, (unsigned char)offset);        // Set byte
 }
 
 // Disable the hardware cursor
 void disable_cursor()
 {
 	// Set disable bit
-	port_byte_out(REG_SCREEN_CTRL, 0x0a); // Cursor start register
-	port_byte_out(REG_SCREEN_DATA, 0b00100000);
+	outb(REG_SCREEN_CTRL, 0x0a); // Cursor start register
+	outb(REG_SCREEN_DATA, 0b00100000);
 }
 
 // Enable the hardware cursor
 void enable_cursor()
 {
 	// Get maximum scan line
-	port_byte_out(REG_SCREEN_CTRL, 0x09); // Maximum scan line register
-	unsigned char max_scan_line = port_byte_in(REG_SCREEN_DATA) & 0b00011111;
+	outb(REG_SCREEN_CTRL, 0x09); // Maximum scan line register
+	unsigned char max_scan_line = inb(REG_SCREEN_DATA) & 0b00011111;
 
 	// Set cursor start
-	port_byte_out(REG_SCREEN_CTRL, 0x0a); // Cursor start register
-	port_byte_out(REG_SCREEN_DATA, (port_byte_in(REG_SCREEN_DATA) & 0b11000000) | (max_scan_line - 1));
+	outb(REG_SCREEN_CTRL, 0x0a); // Cursor start register
+	outb(REG_SCREEN_DATA, (inb(REG_SCREEN_DATA) & 0b11000000) | (max_scan_line - 1));
 
 
 	// Set cursor end to maximum
-	port_byte_out(REG_SCREEN_CTRL, 0x0b); // Cursor end register
-	port_byte_out(REG_SCREEN_DATA, (port_byte_in(REG_SCREEN_DATA) & 0b11100000) | max_scan_line);
+	outb(REG_SCREEN_CTRL, 0x0b); // Cursor end register
+	outb(REG_SCREEN_DATA, (inb(REG_SCREEN_DATA) & 0b11100000) | max_scan_line);
 }
 
 // Clear the screen
