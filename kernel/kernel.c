@@ -1,4 +1,5 @@
 #include "utils.h"
+#include "idt.h"
 #include "drivers/screen.h"
 #include "drivers/serial.h"
 
@@ -44,13 +45,29 @@ unsigned long long strlen(const char* str)
 
 int main()
 {
+	serial_init(SERIAL_COM1, 1);
+
+	// Set up IDT
+	struct idt_entry idt_tbl[256];
+
+	// Divide by 0 interrupt
+	struct idt_entry div_by_zero;
+	div_by_zero.offset_high = (int)interrupt_handler_0 >> 16;
+	div_by_zero.offset_low = (int)interrupt_handler_0 & 0x0000ffff;
+	div_by_zero.segment_selector = 0x0008;
+	div_by_zero.attrs = 0x8f;
+
+	struct idt_ptr idt;
+	idt.size = 1;
+	idt.ptr = idt_tbl;
+	load_idt(idt);
+
 	clear();
 	enable_cursor();
 	print("DerpiOS Kernel - v0.1.0\n");
 	print("Screen driver loaded!\n");
 
-	serial_init(SERIAL_COM1, 1);
-	serial_print("Serial driver loaded!", SERIAL_COM1);
+	//int x = 1/0; // Trying to trigger the divide by 0 isr, but just crashes the OS
 
 	return 0;
 }
