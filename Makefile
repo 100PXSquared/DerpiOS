@@ -20,7 +20,7 @@ build/kernel.bin: kernel/kernel_entry.o $(OBJECT)
 	$(TARGET)-ld -o $@ -Ttext 0x7e00 $^ --oformat binary
 
 .c.o:
-	$(TARGET)-gcc -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector -nostartfiles -nodefaultlibs -ffreestanding -Tkernel -c $< -o $@
+	$(TARGET)-gcc -DDEBUG -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector -nostartfiles -nodefaultlibs -ffreestanding -Tkernel -c $< -o $@
 
 %.o: %.asm
 	nasm $< -f elf -o $@

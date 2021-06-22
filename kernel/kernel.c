@@ -3,44 +3,24 @@
 #include "drivers/screen.h"
 #include "drivers/serial.h"
 
-#define true 1
-#define false 0
-#define NULL (void*)0
-
-void uint_to_string(unsigned int number, char out[20])
+void register_idt_entry(
+	const unsigned int handler_addr, const unsigned char attributes,
+	const unsigned char idx, struct idt_entry idt_tbl[256]
+)
 {
-	char* ptr = out;
-
-	unsigned int i;
-	unsigned char hitnum = false;
-	for (i = 0; i < 20; i++) {
-		unsigned int digit = number;
-		unsigned int place = 1;
-
-		unsigned int j;
-		for (j = 19 - i; j > 0; j--) {
-			digit /= 10;
-			place *= 10;
-		}
-
-		if (digit != 0) hitnum = true;
-		
-		if (hitnum) {
-			*ptr = digit + 0x30;
-			ptr++;
-			number -= digit * place;
-		}
-	}
-	if (!hitnum) *ptr = '0';
+	struct idt_entry entry;
+	entry.offset_high = handler_addr >> 16;
+	entry.offset_low = handler_addr & 0x0000ffff;
+	entry.segment_selector = 0x0008;
+	entry.attrs = attributes;
+	idt_tbl[idx] = entry;
 }
 
-unsigned long long strlen(const char* str)
-{
-	if (str == NULL) return 0;
+#define REGISTER_INTERRUPT(idx) register_idt_entry((unsigned int)interrupt_handler_ ## idx, 0x8e, idx, idt_tbl)
 
-	const char* ptr;
-	for (ptr = str; *ptr != '\0'; ptr++);
-	return ptr - str;
+void infinite_recursion()
+{
+	infinite_recursion();
 }
 
 int main()
@@ -50,14 +30,29 @@ int main()
 	// Set up IDT
 	struct idt_entry idt_tbl[256];
 
-	// Divide by 0 interrupt
-	struct idt_entry div_by_zero;
-	div_by_zero.offset_high = (int)interrupt_handler_0 >> 16;
-	div_by_zero.offset_low = (int)interrupt_handler_0 & 0x0000ffff;
-	div_by_zero.segment_selector = 0x0008;
-	div_by_zero.attrs = 0x8e;
-
-	idt_tbl[0] = div_by_zero;
+	REGISTER_INTERRUPT(0);
+	REGISTER_INTERRUPT(1);
+	REGISTER_INTERRUPT(2);
+	REGISTER_INTERRUPT(3);
+	REGISTER_INTERRUPT(4);
+	REGISTER_INTERRUPT(5);
+	REGISTER_INTERRUPT(6);
+	REGISTER_INTERRUPT(7);
+	REGISTER_INTERRUPT(8);
+	// 9 outdated
+	REGISTER_INTERRUPT(10);
+	REGISTER_INTERRUPT(11);
+	REGISTER_INTERRUPT(12);
+	REGISTER_INTERRUPT(13);
+	REGISTER_INTERRUPT(14);
+	// 15 reserved
+	REGISTER_INTERRUPT(16);
+	REGISTER_INTERRUPT(17);
+	REGISTER_INTERRUPT(18);
+	REGISTER_INTERRUPT(19);
+	REGISTER_INTERRUPT(20);
+	// 21-29 reserved
+	REGISTER_INTERRUPT(30);
 
 	struct idt_ptr idt;
 	idt.size = sizeof(struct idt_entry) * 256 - 1;
@@ -69,7 +64,7 @@ int main()
 	print("DerpiOS Kernel - v0.1.0\n");
 	print("Screen driver loaded!\n");
 
-	int x = 1/0; // Triggers the divide by 0 ISR
+	//__asm__("int $14"); testing ISRs
 
 	return 0;
 }
