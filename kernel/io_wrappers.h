@@ -13,4 +13,6 @@ unsigned short inw(unsigned short port);
 // Write word
 void outw(unsigned short port, unsigned short word);
 
+void io_wait();
+
 #endif

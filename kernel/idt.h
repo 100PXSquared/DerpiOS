@@ -36,6 +36,7 @@ struct stack_state {
 	unsigned int eflags;
 }__attribute__((packed));
 
+// CPU Exceptions
 void interrupt_handler_0();
 void interrupt_handler_1();
 void interrupt_handler_2();
@@ -59,5 +60,9 @@ void interrupt_handler_19();
 void interrupt_handler_20();
 // 21-29 reserved
 void interrupt_handler_30();
+// 31 reserved
+
+// PIC Interrupts
+void interrupt_handler_33(); // Keyboard
 
 #endif

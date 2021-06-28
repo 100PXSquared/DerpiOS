@@ -1,6 +1,9 @@
 #include "idt.h"
+#include "pic.h"
 #include "utils.h"
+#include "io_wrappers.h"
 #include "drivers/serial.h"
+#include "drivers/keyboard.h"
 
 void interrupt_handler(struct cpu_state cpu, unsigned int interrupt, struct stack_state stack)
 {
@@ -46,9 +49,24 @@ void interrupt_handler(struct cpu_state cpu, unsigned int interrupt, struct stac
 		//memset(num_buffer, 0, 20); ready for if I need to print more debug info
 
 		serial_print("\r\n", SERIAL_COM1);
+		#ifdef DEBUG
+		while (1); // If we're in debug mode, then hang the system here so we can check the serial monitor for the exception
+		#endif
+		return;
 	}
 
-	#ifdef DEBUG
-	while (1); // If we're in debug mode, then hang the system here so we can check the serial monitor
-	#endif
+	if (interrupt >= PIC1_START && interrupt <= PIC2_END) {
+		const unsigned char pic_interrupt_idx = interrupt - PIC1_START; // Localise interrupt id to PIC ids
+
+		switch (pic_interrupt_idx) {
+			case 1: // Keyboard
+				handle_scancode();
+				break;
+		}
+
+		// Send EOI to PICs
+		if (interrupt < PIC2_START) outb(PIC1_COMM, PIC_EOI);
+		else outb(PIC2_COMM, PIC_EOI);
+		return;
+	}
 }

@@ -4,7 +4,9 @@ KERNEL_OFFSET equ 0x7e00
 mov [BOOT_DRIVE], dl ; Copy drive number provided by BIOS to BOOT_DRIVE label
 
 ; Init stack pointer to safe memory
-mov bp, 0x9000
+mov bx, 0x9000
+mov ss, bx
+mov bp, 0x0
 mov sp, bp
 
 ; Print startup message
@@ -35,7 +37,7 @@ load_kernel:
 
 	; Load from disk
 	mov bx, KERNEL_OFFSET ; Set read pointer
-	mov dh, 8             ; Sectors to load
+	mov dh, 32            ; Sectors to load (16KiB of kernel)
 	mov dl, [BOOT_DRIVE]  ; Disk to load from
 	call disk_load
 

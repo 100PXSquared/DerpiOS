@@ -10,4 +10,7 @@ void* memcpy(void* dest, const void* src, unsigned long long len);
 unsigned long long strlen(const char* str);
 void uint_to_string(unsigned int number, char* out);
 
+// Converts a 32 bit hex value to a string
+char* to_hex_str(const unsigned int num);
+
 #endif

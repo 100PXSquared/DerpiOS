@@ -52,6 +52,7 @@ common_interrupt_handler:
 	; return to the code that got interrupted
 	iret
 
+; CPU Exceptions
 no_error_code_interrupt_handler 0
 no_error_code_interrupt_handler 1
 no_error_code_interrupt_handler 2
@@ -75,3 +76,7 @@ no_error_code_interrupt_handler 19
 no_error_code_interrupt_handler 20
 ; 21-29 reserved
 error_code_interrupt_handler    30
+; 31 reserved
+
+; PIC Interrupts
+no_error_code_interrupt_handler 33

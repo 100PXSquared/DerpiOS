@@ -25,3 +25,11 @@ outw:
 	mov dx, [esp + 4]
 	out dx, ax
 	ret
+
+; https://wiki.osdev.org/Inline_Assembly/Examples#I.2FO_access
+global io_wait
+io_wait:
+	mov al, 0
+	mov dx, 0x80
+	out dx, al
+	ret

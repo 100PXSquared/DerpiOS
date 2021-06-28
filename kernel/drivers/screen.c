@@ -95,12 +95,28 @@ void scroll(unsigned int* offset)
 // Put a char in video memory
 void putchar(const char chr, const int col,  const int row, char attrs)
 {
-	unsigned int offset;
+	int offset;
 	if (col >= 0 && row >= 0) offset = get_vidmem_offset(col, row);
 	else offset = get_cursor();
 
-	if (chr == '\n') offset = get_vidmem_offset(79, offset / (2 * COLS));
-	else {
+	if (chr == '\b') {
+		while (1) {
+			offset -= 2;
+			if (offset < 0) return;
+
+			unsigned char* vidptr = (unsigned char*)VGA_ADDR + offset;
+			*vidptr = '\0';
+			*(vidptr + 1) = attrs;
+
+			if (*(vidptr - 2) != '\0') break;
+			if (offset % (COLS * 2) == 0) break; // If we reached the start of the next line up, stop
+		}
+
+		set_cursor(offset);
+		return;
+	} else if (chr == '\n') {
+		offset = get_vidmem_offset(79, offset / (2 * COLS));
+	} else {
 		unsigned char* vidptr = (unsigned char*)VGA_ADDR + offset;
 		*vidptr = chr;
 		*(vidptr + 1) = attrs;
@@ -114,6 +130,7 @@ void putchar(const char chr, const int col,  const int row, char attrs)
 // Put a string in video memory
 void putstr(const char* str, const int col, const int row)
 {
+	if (str == NULL || *str == '\0') return;
 	if (col >= 0 && row >= 0) set_cursor(get_vidmem_offset(col, row));
 
 	const char* ptr;

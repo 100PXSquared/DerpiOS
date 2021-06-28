@@ -1,4 +1,5 @@
 #include "utils.h"
+#include "drivers/screen.h"
 
 void* memset(void* data, const char val, unsigned long long len)
 {
@@ -49,4 +50,18 @@ void uint_to_string(unsigned int number, char* out)
 			number -= digit * place;
 		}
 	}
+}
+
+char* to_hex_str(const unsigned int num)
+{
+	char* out = "0x00000000";
+
+	int i;
+	for (i = 0; i < 8; i++) {
+		unsigned char digit = (num >> (i * 4)) & 0xf;
+		digit += digit < 10 ? 0x30 : 0x37;
+		out[9 - i] = digit;
+	}
+
+	return out;
 }
